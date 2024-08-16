@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-func GetKeyboards() ([]string, error) {
-	keyboards := []string{}
+func GetKeyboards() (map[string]string, error) {
+	keyboards := make(map[string]string)
 	inputFile, err := os.ReadFile("/proc/bus/input/devices")
 	if err != nil {
 		return nil, err
@@ -23,10 +23,16 @@ func GetKeyboards() ([]string, error) {
 
 		deviceN := deviceInfo[1]
 		deviceName := strings.Split(deviceN, "N: Name=")[1]
-    deviceName = deviceName[1:]
+		deviceName = deviceName[1:]
 
 		if strings.Contains(strings.ToLower(deviceName), fmt.Sprintf("keyboard\"")) {
-			keyboards = append(keyboards, device)
+
+			deviceName = deviceName[:len(deviceName)-1]
+
+			if _, exists := keyboards[deviceName]; !exists {
+				keyboards[deviceName] = device
+			}
+
 		}
 
 	}
