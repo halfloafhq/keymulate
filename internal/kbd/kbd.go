@@ -39,3 +39,19 @@ func GetKeyboards() (map[string]string, error) {
 
 	return keyboards, nil
 }
+
+func GetEvents(keyboards map[string]string) []string {
+  events := []string{}
+
+  for _, keyboard := range keyboards {
+    deviceH := strings.Split(keyboard, "\n")[5]
+    handlers := strings.Split(strings.Split(deviceH, "H: Handlers=")[1], " ")
+    for _, handler := range handlers {
+      if strings.Contains(handler, "event") {
+        events = append(events, handler)
+      }
+    }
+  }
+
+  return events
+}

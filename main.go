@@ -13,5 +13,6 @@ func main() {
 		log.Fatalf("Error finding keyboards: %s\n", err.Error())
 	}
 
-  fmt.Println(keyboards)
+  events := kbd.GetEvents(keyboards)
+  fmt.Println(events)
 }
