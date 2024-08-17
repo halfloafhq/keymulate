@@ -7,6 +7,8 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+
+	"github.com/halfloafhq/keymulate/internal/audio"
 )
 
 type inputEvent struct {
@@ -69,6 +71,10 @@ func GetEvents(keyboards map[string]string) []string {
 func Listen(events []string) error {
 	var wg sync.WaitGroup
 
+  otoCtx := audio.LoadAudioCtx()
+
+  press, release := audio.LoadSoundsForKeyboard("cream")
+
 	for _, event := range events {
 		wg.Add(1)
 		go func(eventPath string) {
@@ -93,9 +99,26 @@ func Listen(events []string) error {
 					continue
 				}
 
-        //Play audio here
-				fmt.Printf("Event from %s: Type: %d, Code: %d, Value: %d\n", 
-					eventPath, event.Type, event.Code, event.Value)
+        // Play audio based on event type and code
+				if event.Type == 1 { // EV_KEY events
+					var sound []byte
+					var soundKey string
+
+					if event.Value == 1 { // Key press
+						soundKey = audio.GetSoundKey(event.Code, true)
+						sound = press[soundKey]
+					} else if event.Value == 0 { // Key release
+						soundKey = audio.GetSoundKey(event.Code, false)
+						sound = release[soundKey]
+					}
+
+					if sound != nil {
+						go audio.PlaySound(otoCtx, sound)
+					}
+				}
+
+//				fmt.Printf("Event from %s: Type: %d, Code: %d, Value: %d\n", 
+//					eventPath, event.Type, event.Code, event.Value)
 			}
 		}(event)
 	}
