@@ -1,10 +1,20 @@
 package kbd
 
 import (
+	"encoding/binary"
 	"fmt"
 	"os"
 	"strings"
+	"sync"
+	"syscall"
 )
+
+type inputEvent struct {
+	Time  syscall.Timeval
+	Type  uint16
+	Code  uint16
+	Value int32
+}
 
 func GetKeyboards() (map[string]string, error) {
 	keyboards := make(map[string]string)
@@ -41,17 +51,54 @@ func GetKeyboards() (map[string]string, error) {
 }
 
 func GetEvents(keyboards map[string]string) []string {
-  events := []string{}
+	events := []string{}
 
-  for _, keyboard := range keyboards {
-    deviceH := strings.Split(keyboard, "\n")[5]
-    handlers := strings.Split(strings.Split(deviceH, "H: Handlers=")[1], " ")
-    for _, handler := range handlers {
-      if strings.Contains(handler, "event") {
-        events = append(events, handler)
-      }
-    }
-  }
+	for _, keyboard := range keyboards {
+		deviceH := strings.Split(keyboard, "\n")[5]
+		handlers := strings.Split(strings.Split(deviceH, "H: Handlers=")[1], " ")
+		for _, handler := range handlers {
+			if strings.Contains(handler, "event") {
+				events = append(events, handler)
+			}
+		}
+	}
 
-  return events
+	return events
+}
+
+func Listen(events []string) error {
+	var wg sync.WaitGroup
+
+	for _, event := range events {
+		wg.Add(1)
+		go func(eventPath string) {
+			defer wg.Done()
+			
+			file, err := os.Open(fmt.Sprintf("/dev/input/%s", eventPath))
+			if err != nil {
+				fmt.Printf("Error opening %s: %v\n", eventPath, err)
+				return
+			}
+			defer file.Close()
+
+			for {
+				event := inputEvent{}
+				err := binary.Read(file, binary.LittleEndian, &event)
+				if err != nil {
+					if err == syscall.EINVAL {
+						fmt.Printf("Device %s disconnected or no longer available\n", eventPath)
+						return
+					}
+					fmt.Printf("Error reading from %s: %v\n", eventPath, err)
+					continue
+				}
+
+				fmt.Printf("Event from %s: Type: %d, Code: %d, Value: %d\n", 
+					eventPath, event.Type, event.Code, event.Value)
+			}
+		}(event)
+	}
+
+	wg.Wait()
+	return nil
 }
