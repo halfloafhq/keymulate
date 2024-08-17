@@ -73,7 +73,7 @@ func Listen(events []string) error {
 
   otoCtx := audio.LoadAudioCtx()
 
-  press, release := audio.LoadSoundsForKeyboard("cream")
+  press, release := audio.LoadSoundsForKeyboard("mxbrown")
 
 	for _, event := range events {
 		wg.Add(1)

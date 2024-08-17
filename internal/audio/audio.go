@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 
 	"github.com/ebitengine/oto/v3"
 	"github.com/hajimehoshi/go-mp3"
@@ -42,8 +43,8 @@ func PlayRelease(otoCtx *oto.Context, key int, audio io.Reader) {
 	}
 }
 
-func loadSound(switchType, soundName, action string) []byte {
-	soundFile, err := os.Open(fmt.Sprintf("/home/shbhtngpl/personal/halfloafhq/keymulate/audio/%s/%s/%s.mp3", switchType, action, soundName))
+func loadSound(switchType, soundName, action, cwd string) []byte {
+	soundFile, err := os.Open(fmt.Sprintf("%s/audio/%s/%s/%s.mp3", cwd, switchType, action, soundName))
 
 	if err != nil {
 		log.Fatalf("failed to open sound file: %v", err)
@@ -59,6 +60,11 @@ func loadSound(switchType, soundName, action string) []byte {
 }
 
 func LoadSoundsForKeyboard(switchType string) (map[string][]byte, map[string][]byte) {
+  cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("failed to get cwd: %v", err)
+	}
+
 	pressSounds := make(map[string][]byte)
 	releaseSounds := make(map[string][]byte)
 
@@ -66,12 +72,12 @@ func LoadSoundsForKeyboard(switchType string) (map[string][]byte, map[string][]b
 	releaseKeys := []string{"GENERIC", "ENTER", "BACKSPACE", "SPACE"}
 
 	for _, key := range pressKeys {
-		sound := loadSound(switchType, key , "press")
+		sound := loadSound(switchType, key , "press", cwd)
 		pressSounds[key] = sound
 	}
 
 	for _, key := range releaseKeys {
-		sound := loadSound(switchType, key, "release")
+		sound := loadSound(switchType, key, "release", cwd)
 		releaseSounds[key] = sound
 	}
 
@@ -111,7 +117,7 @@ func PlaySound(otoCtx *oto.Context, sound []byte) {
 	// Wait for the sound to finish playing
 	for player.IsPlaying() {
 		// You might want to add a small sleep here to prevent busy-waiting
-		// time.Sleep(time.Millisecond)
+		 time.Sleep(time.Millisecond)
 	}
 
 	err = player.Close()

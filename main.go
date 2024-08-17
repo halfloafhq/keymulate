@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/halfloafhq/keymulate/internal/kbd"
@@ -14,8 +13,7 @@ func main() {
 	}
 
   events := kbd.GetEvents(keyboards)
-  fmt.Println(events)
-  
+
   //listen to events
   kbd.Listen(events)
 }
