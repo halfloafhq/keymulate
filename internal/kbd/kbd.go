@@ -93,6 +93,7 @@ func Listen(events []string) error {
 					continue
 				}
 
+        //Play audio here
 				fmt.Printf("Event from %s: Type: %d, Code: %d, Value: %d\n", 
 					eventPath, event.Type, event.Code, event.Value)
 			}
