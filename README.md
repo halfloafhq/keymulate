@@ -42,55 +42,7 @@ sudo apt-get install libasound2-dev
 To run Keymulate, you'll need root privileges to access the input devices:
 
 ```bash
-sudo ./keymulate
-```
-
-## Setting up as a Systemd Service
-
-To have Keymulate start automatically on boot, you can set it up as a systemd service:
-
-1. Create a systemd service file:
-   ```bash
-   sudo nano /etc/systemd/system/keymulate.service
-   ```
-
-2. Add the following content to the file:
-   ```
-   [Unit]
-   Description=Keymulate Keyboard Sound Simulator
-   After=network.target
-
-   [Service]
-   ExecStart=/path/to/keymulate
-   Restart=always
-   User=root
-
-   [Install]
-   WantedBy=multi-user.target
-   ```
-
-   Replace `/path/to/keymulate` with the actual path to your compiled binary.
-
-3. Save the file and exit the editor.
-
-4. Reload systemd to recognize the new service:
-   ```bash
-   sudo systemctl daemon-reload
-   ```
-
-5. Enable the service to start on boot:
-   ```bash
-   sudo systemctl enable keymulate.service
-   ```
-
-6. Start the service:
-   ```bash
-   sudo systemctl start keymulate.service
-   ```
-
-You can check the status of the service at any time with:
-```bash
-sudo systemctl status keymulate.service
+sudo -E ./keymulate
 ```
 
 ## Windows Support
