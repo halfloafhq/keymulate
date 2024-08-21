@@ -49,6 +49,7 @@ sudo apt-get install libasound2-dev
 ```
 
 ### Set up as systemd service (thanks to [@ShashwatAgrawal20](https://github.com/ShashwatAgrawal20/))
+
 1. Go to user's systemd directory:
     ```bash
     cd ~/.config/systemd/user/
