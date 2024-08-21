@@ -37,13 +37,43 @@ sudo apt-get install libasound2-dev
    go build -o keymulate
    ```
 
+3. Set file capabilities:
+    ```bash
+    sudo setcap cap_dac_read_search+ep main
+    ```
+
 ### Running
 
-To run Keymulate, you'll need root privileges to access the input devices:
-
 ```bash
-sudo -E ./keymulate
+./keymulate
 ```
+
+## Set up as systemd service (thanks to [@ShashwatAgrawal20](https://github.com/ShashwatAgrawal20/))
+1. Go to user's systemd directory:
+    ```bash
+    cd ~/.config/systemd/user/
+    ```
+
+2. Create keymulate.service:
+    ```bash
+    touch keymulate.service
+    ```
+
+3. Describe the service:
+    ```
+    [Unit]
+    Description=Keymulate Service
+    Requires=pipewire.service pipewire-pulse.service wireplumber.service
+    After=pipewire.service pipewire-pulse.service wireplumber.service
+
+    [Service]
+    ExecStart=/path/to/keymulate/binary
+    WorkingDirectory=/path/to/keymulate/directory
+    Restart=on-failure
+
+    [Install]
+    WantedBy=default.target
+    ```  
 
 ## Windows Support
 
