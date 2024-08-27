@@ -39,7 +39,7 @@ sudo apt-get install libasound2-dev
 
 3. Set file capabilities:
     ```bash
-    sudo setcap cap_dac_read_search+ep main
+    sudo setcap cap_dac_read_search+ep keymulate
     ```
 
 ### Running
