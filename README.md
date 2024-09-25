@@ -48,6 +48,30 @@ sudo apt-get install libasound2-dev
 ./keymulate
 ```
 
+### Choose your switch
+
+You can choose the switch you want by passing in the name under the switch flag.
+
+```bash
+./keymulate --switch=mxbrown
+```
+
+Available switches:
+
+- alpaca
+- blackink
+- bluealps
+- boxnavy
+- buckling
+- cream
+- holypanda
+- mxblack
+- mxblue
+- mxbrown
+- redink
+- topre
+- turquoise
+
 ### Set up as systemd service (thanks to [@ShashwatAgrawal20](https://github.com/ShashwatAgrawal20/))
 
 1. Go to user's systemd directory:
