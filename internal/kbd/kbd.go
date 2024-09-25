@@ -2,6 +2,7 @@ package kbd
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -68,18 +69,24 @@ func GetEvents(keyboards map[string]string) []string {
 	return events
 }
 
-func Listen(events []string) error {
+func Listen(switchOpt string, events []string) error {
+
+	if !isValidSwitch(switchOpt) {
+		fmt.Printf("Invalid switch name entered. Please insert a valid switch name.\n")
+		return errors.New("Invalid switch name")
+	}
+
 	var wg sync.WaitGroup
 
-  otoCtx := audio.LoadAudioCtx()
+	otoCtx := audio.LoadAudioCtx()
 
-  press, release := audio.LoadSoundsForKeyboard("mxbrown")
+	press, release := audio.LoadSoundsForKeyboard(switchOpt)
 
 	for _, event := range events {
 		wg.Add(1)
 		go func(eventPath string) {
 			defer wg.Done()
-			
+
 			file, err := os.Open(fmt.Sprintf("/dev/input/%s", eventPath))
 			if err != nil {
 				fmt.Printf("Error opening %s: %v\n", eventPath, err)
@@ -99,7 +106,7 @@ func Listen(events []string) error {
 					continue
 				}
 
-        // Play audio based on event type and code
+				// Play audio based on event type and code
 				if event.Type == 1 { // EV_KEY events
 					var sound []byte
 					var soundKey string
@@ -117,12 +124,45 @@ func Listen(events []string) error {
 					}
 				}
 
-//				fmt.Printf("Event from %s: Type: %d, Code: %d, Value: %d\n", 
-//					eventPath, event.Type, event.Code, event.Value)
+				//				fmt.Printf("Event from %s: Type: %d, Code: %d, Value: %d\n",
+				//					eventPath, event.Type, event.Code, event.Value)
 			}
 		}(event)
 	}
 
 	wg.Wait()
 	return nil
+}
+
+func isValidSwitch(switchName string) bool {
+	switch switchName {
+	case "alpaca":
+		return true
+	case "blackink":
+		return true
+	case "bluealps":
+		return true
+	case "boxnavy":
+		return true
+	case "buckling":
+		return true
+	case "cream":
+		return true
+	case "holypanda":
+		return true
+	case "mxblack":
+		return true
+	case "mxblue":
+		return true
+	case "mxbrown":
+		return true
+	case "redink":
+		return true
+	case "topre":
+		return true
+	case "turquoise":
+		return true
+	default:
+		return false
+	}
 }
